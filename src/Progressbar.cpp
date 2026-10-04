@@ -41,19 +41,16 @@ void Progressbar::updateProgressState(int progress) {
     if (progress == this->lastProgress) {
         return;
     }
-    if (this->height <= 0) {
-        this->height = (CrossCraft::instance->height > 0) ? CrossCraft::instance->height : 480;
-    }
-    if (this->width <= 0) {
-        this->width = (CrossCraft::instance->width > 0) ? CrossCraft::instance->width : 640;
-    }
+    int curH = this->height > 0 ? this->height : (CrossCraft::instance->height > 0 ? CrossCraft::instance->height : 480);
+    int curW = this->width > 0 ? this->width : (CrossCraft::instance->width > 0 ? CrossCraft::instance->width : 640);
 
     if (std::abs(progress - this->lastProgress) < 2 && progress != 100 && progress != 0) {
         return;
     }
     this->lastProgress = progress;
-    int screenWidth = this->width * 240 / this->height;
-    int screenHeight = this->height * 240 / this->height;
+    
+    int screenWidth = curW * 240 / curH;
+    int screenHeight = curH * 240 / curH;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     Tessellator& t = Tessellator::getInstance();

@@ -11,7 +11,7 @@ void Bush::tick(Level* level, int x, int y, int z, Random* random) {
     if (!level->isLit(x, y, z) || (tileIdBelow != Tile::grass->id && tileIdBelow != Tile::dirt->id)) {
         level->setTile(x, y, z, 0);
     } else {
-        if (random->nextInt(5) == 0) {
+        if (random->nextInt(5) == 0 || level->growTrees) {
             level->setTileNoUpdate(x, y, z, 0);
             if (!level->maybeGrowTree(x, y, z)) {
                 level->setTileNoUpdate(x, y, z, this->id);

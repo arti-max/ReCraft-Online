@@ -5,15 +5,19 @@
 #include <ctime>
 #include <gc.h>
 
+
 extern "C" void initialize_gl4es();
 
 int main() {
+    setenv("LIBGL_USEVBO", "1", 1);
+    setenv("LIBGL_BATCH", "1", 1);
+    
     GC_INIT();
     GC_add_roots(&CrossCraft::instance, &CrossCraft::instance + 1);
     
     std::cout << "CrossCraft C++ main() called" << std::endl;
     srand(time(NULL));
-    
+
     try {
         std::cout << "Initializing gl4es..." << std::endl;
         initialize_gl4es();

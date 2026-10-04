@@ -6,6 +6,7 @@
 #include "level/LevelLoaderListener.hpp"
 #include "level/tile/Tile.hpp"
 // mobs:
+#include "mob/Sheep.hpp"
 #include "mob/Spider.hpp"
 #include "mob/Zombie.hpp"
 #include "mob/Skeleton.hpp"
@@ -28,7 +29,7 @@ void MobSpawner::spawn(int area, Entity* player, LevelLoaderListener* listener) 
         if (this->level->random != nullptr) {
             // Logger::logf(PREFIX_DEBUG, "random is nullptr...!\n");
         }
-        int type = this->level->random->nextInt(5);
+        int type = this->level->random->nextInt(6);
         // Logger::logf(PREFIX_DEBUG, "After type randomed!\n");
         int spawnX = this->level->random->nextInt(this->level->width);
         int spawnY = std::min(this->level->random->nextFloat(), this->level->random->nextFloat()) * this->level->depth;
@@ -95,6 +96,7 @@ void MobSpawner::spawn(int area, Entity* player, LevelLoaderListener* listener) 
                             case 2: mob = new AnimalMob(level, fx, fy, fz); break;
                             case 3: mob = new Creeper(level, fx, fy, fz); break;
                             case 4: mob = new Spider(level, fx, fy, fz); break;
+                            case 5: mob = new Sheep(level, fx, fy, fz); break;
                         }
 
                         if (mob) {

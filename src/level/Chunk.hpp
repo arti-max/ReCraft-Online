@@ -17,6 +17,7 @@ private:
     int x1 = 0, y1 = 0, z1 = 0;
     int lists = 0;
     bool dirty[2];
+    bool hasMesh[2];
 
     // UNUSED: 
     unsigned int vbo[2];

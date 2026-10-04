@@ -14,6 +14,7 @@ private:
     std::vector<float> buffer;
     int vertices = 0;
     int p = 0;
+    int indexCnt = 0;
     int len = 0;
     float u = 0.0f, v = 0.0f;
     float r = 0, g = 0, b = 0;

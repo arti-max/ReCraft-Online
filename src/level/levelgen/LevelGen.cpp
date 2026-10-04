@@ -8,6 +8,8 @@
 #include <iostream>
 #include <algorithm>
 
+#define SAFE_DIV(val, max_val) ((max_val) > 1 ? ((val) * 100 / ((max_val) - 1)) : 100)
+
 LevelGen::LevelGen(LevelLoaderListener* listener) : listener(listener), random() {}
 LevelGen::~LevelGen() = default;
 
@@ -126,7 +128,7 @@ void LevelGen::soil(std::vector<int>& map) {
 void LevelGen::carve() {
     const int numCaves = width * height * depth / 256 / 64;
     for (int i = 0; i < numCaves; ++i) {
-        listener->levelLoadProgress(i * 100 / (numCaves - 1));
+        listener->levelLoadProgress(SAFE_DIV(i, numCaves));
 
         float x = random.nextFloat() * width;
         float y = random.nextFloat() * depth;
@@ -188,7 +190,7 @@ void LevelGen::carve() {
 void LevelGen::addOres(int tileId, int count, int abundance) {
     int veinsCount = width * height * depth / 256 / 64 * count / 100;
     for (int i = 0; i < veinsCount; ++i) {
-        listener->levelLoadProgress(i * 100 / (veinsCount - 1) / 4 + abundance * 100 / 4);
+        listener->levelLoadProgress(SAFE_DIV(i, veinsCount) / 4 + abundance * 100 / 4);
         float x = random.nextFloat() * width;
         float y = random.nextFloat() * depth;
         float z = random.nextFloat() * height;
@@ -269,7 +271,7 @@ void LevelGen::addWaterAndLava() {
 
     int waterSources = width * height / 8000;
     for (int i = 0; i < waterSources; ++i) {
-        listener->levelLoadProgress(i * 100 / (waterSources - 1));
+        listener->levelLoadProgress(SAFE_DIV(i, waterSources));
         int wx = random.nextInt(width);
         int wy = waterLevel - 1 - random.nextInt(2);
         int wz = random.nextInt(height);
@@ -280,7 +282,7 @@ void LevelGen::addWaterAndLava() {
     listener->levelLoadUpdate("Melting..");
     int lavaSources = width * height * depth / 20000;
     for (int i = 0; i < lavaSources; ++i) {
-        listener->levelLoadProgress(i * 100 / (lavaSources - 1));
+        listener->levelLoadProgress(SAFE_DIV(i, lavaSources));
         int lx = random.nextInt(width);
         int ly = (int)(random.nextFloat() * random.nextFloat() * (waterLevel - 3));
         int lz = random.nextInt(height);
@@ -335,7 +337,7 @@ void LevelGen::addSurfaceFlowers(const std::vector<int>& map) {
     int attempts = width * height / 3000;
     for (int i = 0; i < attempts; ++i) {
         int type = random.nextInt(2);
-        listener->levelLoadProgress(i * 50 / (attempts - 1));
+        listener->levelLoadProgress(SAFE_DIV(i, attempts) / 2);
         int x = random.nextInt(width);
         int z = random.nextInt(height);
 
@@ -362,7 +364,7 @@ void LevelGen::addUndergroundMushrooms(const std::vector<int>& map) {
     int spawned = 0;
     for (int i = 0; i < attempts; ++i) {
         int type = random.nextInt(2);
-        listener->levelLoadProgress(i * 50 / (attempts - 1) + 50);
+        listener->levelLoadProgress(SAFE_DIV(i, attempts) / 2 + 50);
         int x = random.nextInt(width);
         int y = random.nextInt(depth);
         int z = random.nextInt(height);

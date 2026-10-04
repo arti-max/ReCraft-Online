@@ -624,7 +624,7 @@ void CrossCraft::tick() {
                                 pickedID = Tile::rock->id;
                             }
 
-                            if (this->player->inventory->inInventory(pickedID) != -1) {
+                            if (this->player->inventory->inInventory(pickedID) != -1 || !this->gamemode->isSurvival()) {
                                 this->player->inventory->pickTile(pickedID);
                             } 
 
@@ -919,7 +919,7 @@ void CrossCraft::render(float partialTicks) {
     int waterChunks = this->levelRenderer->render(this->player, 1);
     glColorMask(true, true, true, true);
     if (waterChunks > 0) {
-        this->levelRenderer->render(this->player, 1);
+        this->levelRenderer->renderCollectedChunks();
     }
     this->checkGlError("Color Mask");
     glDisable(GL_BLEND);
@@ -1365,17 +1365,14 @@ void CrossCraft::generateNewLevel(int width, int height, int depth) {
     Logger::logf(PREFIX_DEBUG, "Before player reset\n");
 
     this->player->resetPos();
-    Logger::logf(PREFIX_DEBUG, "Before preparePlayer\n");
     this->gamemode->preparePlayer(this->player);
-    Logger::logf(PREFIX_DEBUG, "Before apply level\n");
     this->gamemode->apply(this->level);
-    Logger::logf(PREFIX_DEBUG, "Before prepareLevel\n");
     this->gamemode->prepareLevel(this->level);
+    this->gamemode->apply(this->player);
     // if (this->level != nullptr) {
     //     this->level->player = this->player;
     //     this->level->addEntity(this->player);
     // }
-    Logger::logf(PREFIX_DEBUG, "Before gc collect\n");
     GC_gcollect(); // да, сборщик мусора в c++, и чё?
 }
 

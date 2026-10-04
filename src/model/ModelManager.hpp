@@ -2,6 +2,8 @@
 #include <string>
 #include "model/Model.hpp"
 #include "model/HumanModel.hpp"
+#include "model/SheepFurModel.hpp"
+#include "model/SheepModel.hpp"
 #include "model/ZombieModel.hpp"
 #include "model/SkeletonModel.hpp"
 #include "model/PigModel.hpp"
@@ -17,7 +19,10 @@ private:
     CreeperModel* creeper = new CreeperModel();
     PigModel* pig = new PigModel(6, 0.0f);
     SpiderModel* spider = new SpiderModel();
+    SheepModel* sheep = new SheepModel();
+    SheepFurModel* sheepFur = new SheepFurModel();
 public:
+    virtual ~ModelManager() = default;
 
     Model* getModel(std::string name) {
         if (name == "human") {
@@ -40,6 +45,12 @@ public:
         }
         if (name == "spider") {
             return (Model*)this->spider;
+        }
+        if (name == "sheep") {
+            return (Model*)this->sheep;
+        }
+        if (name == "sheep.fur") {
+            return (Model*)this->sheepFur;
         }
 
         return (Model*)this->human;

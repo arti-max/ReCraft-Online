@@ -75,10 +75,6 @@ void LiquidTile::tick(Level* level, int x, int y, int z, Random* random) {
 
 
 bool LiquidTile::shouldRenderFace(Level* level, int x, int y, int z, int face) {
-    if (x < 0 || y < 0 || z < 0 || x >= level->width || y >= level->depth) {
-        return false;
-    }
-    
     int neighborId = level->getTile(x, y, z);
 
     if (Tile::tiles[neighborId] && Tile::tiles[neighborId]->getLiquidType() != LiquidType::NOT_LIQUID) {

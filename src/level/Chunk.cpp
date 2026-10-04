@@ -27,6 +27,8 @@ Chunk::Chunk(Level* level, int x0, int y0, int z0, int x1, int y1, int z1) :
 
     this->lists = glGenLists(2);
     this->setAllDirty();
+    this->hasMesh[0] = false;
+    this->hasMesh[1] = false;
 }
 
 Chunk::~Chunk() {
@@ -42,7 +44,7 @@ void Chunk::rebuild() {
     glEnable(GL_TEXTURE_2D);
     Tile* currentTile = nullptr;
 
-    for (short layer = 0; layer < 2 ; layer++) {
+    for (short layer = 0; layer < 2; layer++) {
         this->dirty[layer] = true;
     }
 
@@ -73,12 +75,16 @@ void Chunk::rebuild() {
 
         this->t.end();
         glEndList();
+
         this->dirty[layer] = false;
+        this->hasMesh[layer] = hasAnyGeometry;
+
         if (!hasNextRenderPass) {
             for (short next = layer + 1; next < 2; next++) {
                 glNewList(this->lists + next, GL_COMPILE);
                 glEndList();
                 this->dirty[next] = false;
+                this->hasMesh[next] = false;
             }
             break;
         }
@@ -121,7 +127,7 @@ void Chunk::appendLists(std::vector<GLint>& listsArr, int renderPass) {
     if (!this->visible) {
         return;
     } 
-    if (!this->dirty[renderPass]) {
+    if (this->hasMesh[renderPass]) {
         listsArr.push_back(this->lists + renderPass);
     }
 }

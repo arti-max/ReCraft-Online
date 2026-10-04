@@ -10,6 +10,7 @@ Tessellator& Tessellator::getInstance() {
 Tessellator::Tessellator() {
     vertices = 0;
     p = 0; 
+    indexCnt = 0;
     len = VERTEX_SIZE;
     u = 0.0f; v = 0.0f;
     r = 1.0f; g = 1.0f; b = 1.0f;
@@ -23,6 +24,7 @@ Tessellator::Tessellator() {
 
     int maxQuads = MAX_FLOATS / (VERTEX_SIZE * 4);
     indexBuffer.reserve(maxQuads * 6);
+    indexBuffer.resize((MAX_FLOATS / (VERTEX_SIZE * 4)) * 6);
 }
 
 void Tessellator::end() {
@@ -46,7 +48,7 @@ void Tessellator::end() {
     glEnableClientState(GL_NORMAL_ARRAY);
     glNormalPointer(GL_FLOAT, stride, data+8);
 
-    glDrawElements(GL_TRIANGLES, indexBuffer.size(), GL_UNSIGNED_INT, indexBuffer.data());
+    glDrawElements(GL_TRIANGLES, indexCnt, GL_UNSIGNED_INT, indexBuffer.data());
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -70,6 +72,7 @@ void Tessellator::begin() {
 void Tessellator::clear() {
     vertices = 0;
     p = 0;
+    indexCnt = 0;
     indexBuffer.clear();
 }
 
@@ -113,13 +116,13 @@ void Tessellator::vertex(float x, float y, float z) {
 
     if (vertices % 4 == 0 ) {
         unsigned int baseIdx = vertices - 4;
-        indexBuffer.push_back(baseIdx + 0);
-        indexBuffer.push_back(baseIdx + 1);
-        indexBuffer.push_back(baseIdx + 2);
+        indexBuffer[indexCnt++] = baseIdx + 0;
+        indexBuffer[indexCnt++] = baseIdx + 1;
+        indexBuffer[indexCnt++] = baseIdx + 2;
 
-        indexBuffer.push_back(baseIdx + 0);
-        indexBuffer.push_back(baseIdx + 2);
-        indexBuffer.push_back(baseIdx + 3);
+        indexBuffer[indexCnt++] = baseIdx + 0;
+        indexBuffer[indexCnt++] = baseIdx + 2;
+        indexBuffer[indexCnt++] = baseIdx + 3;
     }
 
     if (p >= MAX_FLOATS - VERTEX_SIZE * 4) {

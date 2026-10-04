@@ -65,12 +65,13 @@ if(EMSCRIPTEN)
         set(OPTIM_FLAGS "\
             -O2 \
             -flto \
+            -msimd128 \
             -gline-tables-only \
             -sASSERTIONS=1 \
             -sSTACK_OVERFLOW_CHECK=1 \
         ")
     else()
-        set(OPTIM_FLAGS "-O3 -flto")
+        set(OPTIM_FLAGS "-O3 -flto -msimd128")
     endif()
 
     set_target_properties(CrossCraftWebPP PROPERTIES 
@@ -88,8 +89,11 @@ if(EMSCRIPTEN)
             -s FETCH=1 \
             -s LEGACY_GL_EMULATION=0 \
             -s GL_FFP_ONLY=0 \
+            -s GL_POOL_TEMP_BUFFERS=1 \
+            -s MAX_WEBGL_VERSION=2 \
             -s EXPORTED_FUNCTIONS=['_main','_setAppletParams','_startApplet','_testAsyncify','_setServerParams','_showCrashScreen'] \
             -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','intArrayFromString','UTF8ToString'] \
+            -s ASYNCIFY_REMOVE=[\"Chunk::*\",\"Tessellator::*\",\"LevelRenderer::*\",\"Frustum::*\",\"Tile::*\",\"Level::*\"] \
             -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
             -s STACK_SIZE=8388608 \
             -s INITIAL_MEMORY=536870912 \
@@ -123,6 +127,8 @@ if(EMSCRIPTEN)
         rain.png
         particles.png
         mob/spider.png
+        mob/sheep.png
+        mob/sheep_fur.png
     )
     
     add_custom_command(TARGET CrossCraftWebPP POST_BUILD

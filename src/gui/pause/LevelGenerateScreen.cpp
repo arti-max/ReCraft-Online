@@ -20,24 +20,30 @@ void LevelGenerateScreen::init() {
 
 void LevelGenerateScreen::buttonClicked(Button* btn) {
     if (btn->enabled) {
+        int w = 256;
+        int h = 256;
+        int d = 64;
+
         if (btn->id == 0) {
-            this->cc->generateNewLevel(128, 128, 64);
-            this->cc->setScreen(nullptr);
-            this->cc->grabMouse();
+            w = 128;
+            h = 128;
         }
         if (btn->id == 1) {
-            this->cc->generateNewLevel(256, 256, 64);
-            this->cc->setScreen(nullptr);
-            this->cc->grabMouse();
+            w = 256;
+            h = 256;
         }
         if (btn->id == 2) {
-            this->cc->generateNewLevel(512, 512, 64);
-            this->cc->setScreen(nullptr);
-            this->cc->grabMouse();
+            w = 512;
+            h = 512;
         }
         if (btn->id == 5) {
             this->cc->setScreen(parent);
+            return;
         }
+
+        this->cc->generateNewLevel(w, h, d);
+        this->cc->setScreen(nullptr);
+        this->cc->waitingForFocus = true;
     }
 }
 
