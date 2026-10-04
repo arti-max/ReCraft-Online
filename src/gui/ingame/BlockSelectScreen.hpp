@@ -10,6 +10,7 @@ protected:
     void mouseClicked(int x, int y, int button) override;
 public:
     BlockSelectScreen();
+    virtual ~BlockSelectScreen() = default;
 
     void init() override;
     void render(int xMouse, int yMouse) override;

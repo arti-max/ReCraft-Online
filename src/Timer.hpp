@@ -26,3 +26,4 @@ public:
 private:
     long long getCurrentTimeNanos();
 };
+

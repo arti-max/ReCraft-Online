@@ -74,11 +74,8 @@ void LiquidTile::tick(Level* level, int x, int y, int z, Random* random) {
 
 
 
-bool LiquidTile::shouldRenderFace(Level* level, int x, int y, int z, int layer, int face) {
+bool LiquidTile::shouldRenderFace(Level* level, int x, int y, int z, int face) {
     if (x < 0 || y < 0 || z < 0 || x >= level->width || y >= level->depth) {
-        return false;
-    }
-    if (layer != 1 && this->liquidType == LiquidType::WATER) {
         return false;
     }
     
@@ -89,7 +86,7 @@ bool LiquidTile::shouldRenderFace(Level* level, int x, int y, int z, int layer, 
     }
     
     if (neighborId != this->tileId && neighborId != this->calmTileId) {
-        return face != 1 || level->getTile(x-1, y, z) != 0 && level->getTile(x+1, y, z != 0) && level->getTile(x, y, z-1) != 0 && level->getTile(x, y, z+1) != 0 ? Tile::shouldRenderFace(level, x, y, z, -1, face) : true;
+        return face != 1 || level->getTile(x-1, y, z) != 0 && level->getTile(x+1, y, z != 0) && level->getTile(x, y, z-1) != 0 && level->getTile(x, y, z+1) != 0 ? Tile::shouldRenderFace(level, x, y, z, face) : true;
     }
     
     return false;
@@ -132,4 +129,8 @@ void LiquidTile::neighborChanged(Level* level, int x, int y, int z, int neighbor
     }
 
     level->addToTickNextTick(x, y, z, this->tileId);
+}
+
+short LiquidTile::getRenderPass() {
+    return 1;
 }

@@ -64,26 +64,21 @@ bool GameMode::useItem(Player* player, int type) {
 }
 
 void GameMode::preparePlayer(Player* player) {
-    Level* level = this->cc->level;
-    if (level->player == player) {
-        level->removeEntity(player);
-        level->addEntity(player);
-    }
 }
 
 void GameMode::spawnMob() {
-    // nothing
+    // nothing  
 }
 
 void GameMode::prepareLevel(Level* level) {
     ((Player*)level->getPlayer())->score = 0;
 }
 
-bool isSurvival() {
+bool GameMode::isSurvival() {
     return true;
 }
 
-void apply(Player* player) {
+void GameMode::apply(Player* player) {
     // nothing
 }
 

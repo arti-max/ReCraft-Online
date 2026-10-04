@@ -33,6 +33,8 @@ public:
         this->model->quads.push_back(Quad({v5, v6, v7, v8}, u1, v1_c, u0, v0_c));
     }
 
+    virtual ~ItemModel() = default;
+
     void generateList() {
         this->model->render(0.0625f);
     }

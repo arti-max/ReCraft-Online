@@ -5,6 +5,8 @@ class BasicAttackAI : public BasicAI {
 public:
     int damage = 6;
 
+    ~BasicAttackAI() override = default;
+
     void update() override;
     virtual void doAttack();
     virtual bool attack(Entity* e);

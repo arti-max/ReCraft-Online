@@ -20,7 +20,7 @@ void Bush::tick(Level* level, int x, int y, int z, Random* random) {
     }
 }
 
-bool Bush::render(Tessellator& t, Level* level, int layer, int x, int y, int z) {
+bool Bush::render(Tessellator& t, Level* level, int x, int y, int z) {
     float color = level->getBrightness(x, y, z);
     t.color(color, color, color);
     this->render(t, (float)x, (float)y, (float)z);

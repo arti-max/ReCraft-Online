@@ -1,6 +1,7 @@
 #include "gui/ingame/Hud.hpp"
 #include <GL/gl.h>
 #include "CrossCraft.hpp"
+#include "Logger.hpp"
 #include <string>
 
 Hud::Hud(CrossCraft* cc, Textures* textures, int width, int height) : 
@@ -147,7 +148,7 @@ void Hud::render(Player* player, Level* level, float partialTicks) {
             glBindTexture(GL_TEXTURE_2D, textures->loadTexture("terrain", GL_NEAREST));
 
             t.begin();
-            Tile::tiles[tileId]->render(t, level, 0, -2, 0, 0);
+            Tile::tiles[tileId]->render(t, level, -2, 0, 0);
             t.end();
 
             glDisable(GL_RESCALE_NORMAL);

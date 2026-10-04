@@ -12,10 +12,9 @@ SlabTile::SlabTile(int tileId, bool isDouble) : Tile(tileId) {
     }
 }
 
-bool SlabTile::shouldRenderFace(Level* level, int x, int y, int z, int layer, int face) {
-    if (layer == 1 ) return false;
+bool SlabTile::shouldRenderFace(Level* level, int x, int y, int z, int face) {
     if (face == 1 && !this->doubleSlab) return true;
-    return Tile::shouldRenderFace(level, x, y, z, layer, face);
+    return Tile::shouldRenderFace(level, x, y, z, face);
 }
 
 void SlabTile::onBlockAdded(Level* level, int x, int y, int z) {

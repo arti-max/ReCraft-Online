@@ -16,7 +16,7 @@ private:
     int x0 = 0, y0 = 0, z0 = 0;
     int x1 = 0, y1 = 0, z1 = 0;
     int lists = 0;
-    bool dirty = true;
+    bool dirty[2];
 
     // UNUSED: 
     unsigned int vbo[2];
@@ -39,8 +39,9 @@ public:
     void rebuild(int layer);
     void rebuild();
     void render(int layer);
-    void setDirty();
+    void setAllDirty();
     bool isDirty();
     float distanceToSqr(Player* player);
     void reset();
+    void appendLists(std::vector<int>& lists, int renderPass);
 };

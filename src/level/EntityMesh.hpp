@@ -10,7 +10,7 @@
 
 class EntityMesh {
 private:
-
+    std::vector<Entity*> entitiesToAdd;
 public:
     int width = 0, height = 0, depth = 0;
     std::vector<std::vector<Entity*>> grid; // entities

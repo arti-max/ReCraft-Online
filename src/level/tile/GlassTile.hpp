@@ -4,5 +4,5 @@
 class GlassTile : public TransparentTile {
 public:
     GlassTile(int id);
-    bool shouldRenderFace(Level* level, int x, int y, int z, int layer, int face) override;
+    bool shouldRenderFace(Level* level, int x, int y, int z, int face) override;
 };

@@ -1,4 +1,6 @@
 #pragma once
+#include "gamemode/CreativeGameMode.hpp"
+#include <vector>
 #ifdef __EMSCRIPTEN__
 #include <emscripten/html5.h>
 #include <emscripten.h>
@@ -57,7 +59,7 @@
 
 class CrossCraft : public LevelLoaderListener {
 public:
-    const std::string VERSION_STRING = "0.17  SURVIVAL TEST";
+    const std::string VERSION_STRING = "0.18  SURVIVAL TEST";
     std::string fpsString = "";
 private:
     int lastFpsTime = 0;
@@ -140,6 +142,8 @@ public:
     int width, height;
     GLFWwindow* window;
 
+    std::vector<Screen*> screenStack;
+
     Timer* timer = new Timer(20.0f);
     LevelIO* levelIO = new LevelIO(this);
     Level* level = nullptr;
@@ -154,7 +158,7 @@ public:
     PlayerListScreen* playerListScreen = new PlayerListScreen();
     SoundManager* sound = nullptr;
     Settings* settings = new Settings();
-    GameMode* gamemode = new SurvivalGameMode(this);
+    GameMode* gamemode = new CreativeGameMode(this);
     HeldBlock* heldBlock = new HeldBlock(this);
     Progressbar* progressbar = nullptr;
     NetworkData* netData = new NetworkData(this);

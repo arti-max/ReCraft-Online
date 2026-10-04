@@ -41,5 +41,11 @@ void Data::initAllowedTiles() {
     Data::allowedTiles.push_back(Tile::wool16);
 
     Data::allowedTiles.push_back(Tile::goldBlock);
+    Data::allowedTiles.push_back(Tile::ironBlock);
+    Data::allowedTiles.push_back(Tile::mossStone);
+    Data::allowedTiles.push_back(Tile::slab);
+    Data::allowedTiles.push_back(Tile::bookshelf);
+    Data::allowedTiles.push_back(Tile::tnt);
+    Data::allowedTiles.push_back(Tile::obsidian);
 
 }

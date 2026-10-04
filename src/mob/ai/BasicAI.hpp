@@ -23,6 +23,7 @@ public:
     int noActionTime = 0;
     Entity* attackTarget = nullptr;
 
+    ~BasicAI() override = default;
     void tick(Level* level, Mob* mob) override;
     virtual void jumpFromGround();
     virtual void update();

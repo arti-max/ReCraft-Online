@@ -5,6 +5,7 @@
 #include <GL/glu.h>
 #include <cmath>
 #include <gc.h>
+#include "Logger.hpp"
 #include "emscripten/emscripten.h"
 #include "gamemode/SurvivalGameMode.hpp"
 #include "gc/gc.h"
@@ -147,21 +148,9 @@ void CrossCraft::init() {
     Item::initModels();
     Data::initAllowedTiles();
 
+    this->gamemode->apply(this->player);
+
     Keyboard::enableRepeatEvents(false);
-    
-    this->hotbarSlots = {
-        Tile::rock->id,
-        Tile::sponge->id,
-        Tile::dirt->id,
-        Tile::wood->id,
-        Tile::bush->id,
-        Tile::log->id,
-        Tile::leaves->id,
-        Tile::glass->id,
-        Tile::gravel->id,
-    };
-    this->hotbarIndex = 0;
-    this->selectedTile = this->hotbarSlots[this->hotbarIndex];
 
     this->checkGlError("Post startup");
     
@@ -169,6 +158,9 @@ void CrossCraft::init() {
 
 void CrossCraft::setScreen(Screen* screen) {
     if (this->screen != nullptr) this->screen->onClose();
+    if (this->screen != nullptr && screen == nullptr) {
+        delete this->screen;
+    }
 
     if (screen == nullptr && this->player->health <= 0) {
         screen = new DeathScreen();
@@ -187,6 +179,7 @@ void CrossCraft::setScreen(Screen* screen) {
         int screenWidth = this->width * 240 / this->height;
         int screenHeight = this->height * 240 / this->height;
         screen->init(this, screenWidth, screenHeight);
+        // this->screenStack.push_back(screen);
     }
 }
 
@@ -353,7 +346,7 @@ void CrossCraft::handleMouseClick(int mode) {
                     this->gamemode->hitTile(x, y, z);
                     return;
                 }
-            } else {
+            } else { 
                 int selected = this->player->inventory->getCurrentBlock();
                 if (selected <= 0) {
                     return;
@@ -530,11 +523,14 @@ void CrossCraft::tick() {
                     break;
                 }
 
-                if (Keyboard::getEventKey() == GLFW_KEY_TAB && (this->player->inventory->removeArrow())) {
-                    this->level->addEntity(new Arrow(this->level, this->player, this->player->x, this->player->y, this->player->z, this->player->yRot, this->player->xRot, 1.2f));
+                if (Keyboard::getEventKey() == GLFW_KEY_TAB ) {
+                    if (this->gamemode->isSurvival() && (this->player->inventory->removeArrow()))
+                        this->level->addEntity(new Arrow(this->level, this->player, this->player->x, this->player->y, this->player->z, this->player->yRot, this->player->xRot, 1.2f));
                 }
 
                 if (Keyboard::getEventKey() == this->settings->key_build->keyCode) {
+                    this->gamemode->openInventory();
+                    break;
                     // this->player->releaseAllKeys();
                     // this->setScreen((Screen*)(new InventoryScreen()));
                     // this->releaseMouse();
@@ -547,8 +543,8 @@ void CrossCraft::tick() {
                     this->player->resetPos();
                 }
 
-                if (Keyboard::getEventKey() == this->settings->key_load->keyCode) {
-                    // this->player->resetPos();
+                if (Keyboard::getEventKey() == this->settings->key_load->keyCode && !this->gamemode->isSurvival()) {
+                    this->player->resetPos();
                 }
 
                 if (Keyboard::getEventKey() == GLFW_KEY_F5) {
@@ -719,7 +715,7 @@ update_world:
         fx->tick();
         textures->updateTextureFX(fx->pixels, fx->textureId);
     }
-    if (!this->mpMode && dynamic_cast<SurvivalGameMode*>(this->gamemode)) {
+    if (!this->mpMode && this->gamemode->isSurvival()) {
         this->gamemode->spawnMob();
     }
     ++this->levelRenderer->cloudTicks;
@@ -864,7 +860,7 @@ void CrossCraft::render(float partialTicks) {
         glEnable(GL_ALPHA_TEST);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         glColor4f(1.0f, 1.0f, 1.0f, ((float) std::sin(emscripten_get_now() / 100.0f) * 0.2f + 0.4f) * 0.5f);
-        if (this->levelRenderer->cracks > 0.0f) {
+        if (this->levelRenderer->cracks > 0.0f && dynamic_cast<SurvivalGameMode*>(this->gamemode)) {
             glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
             int texture = this->textures->loadTexture("terrain", GL_NEAREST);
             glBindTexture(GL_TEXTURE_2D, texture);
@@ -920,9 +916,11 @@ void CrossCraft::render(float partialTicks) {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glColorMask(false, false, false, false);
-    this->levelRenderer->render(this->player, 1);
+    int waterChunks = this->levelRenderer->render(this->player, 1);
     glColorMask(true, true, true, true);
-    this->levelRenderer->render(this->player, 1);
+    if (waterChunks > 0) {
+        this->levelRenderer->render(this->player, 1);
+    }
     this->checkGlError("Color Mask");
     glDisable(GL_BLEND);
     glDisable(GL_LIGHTING);
@@ -1346,6 +1344,7 @@ bool CrossCraft::loadLevel(const char username[], int levelid) {
         this->player->resetPos();
         this->gamemode->prepareLevel(this->level);
         this->gamemode->apply(this->level);
+        this->gamemode->apply(this->player);
         // this->level->addEntity(this->player);
 
         return true;
@@ -1363,15 +1362,20 @@ void CrossCraft::generateNewLevel(int width, int height, int depth) {
     // delete this->player;
     this->player = new Player(this->level, this->settings);
     this->level->player = this->player;
+    Logger::logf(PREFIX_DEBUG, "Before player reset\n");
 
     this->player->resetPos();
+    Logger::logf(PREFIX_DEBUG, "Before preparePlayer\n");
     this->gamemode->preparePlayer(this->player);
+    Logger::logf(PREFIX_DEBUG, "Before apply level\n");
     this->gamemode->apply(this->level);
+    Logger::logf(PREFIX_DEBUG, "Before prepareLevel\n");
     this->gamemode->prepareLevel(this->level);
     // if (this->level != nullptr) {
     //     this->level->player = this->player;
     //     this->level->addEntity(this->player);
     // }
+    Logger::logf(PREFIX_DEBUG, "Before gc collect\n");
     GC_gcollect(); // да, сборщик мусора в c++, и чё?
 }
 

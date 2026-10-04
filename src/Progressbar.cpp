@@ -16,6 +16,12 @@ void Progressbar::startProgressBar(std::string& title) {
     this->title = title;
     this->status = "";
     this->lastProgress = -1;
+    if (this->height <= 0) {
+        this->height = (CrossCraft::instance->height > 0) ? CrossCraft::instance->height : 480;
+    }
+    if (this->width <= 0) {
+        this->width = (CrossCraft::instance->width > 0) ? CrossCraft::instance->width : 640;
+    }
     int screenWidth = this->width * 240 / this->height;
     int screenHeight = this->height * 240 / this->height;
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -35,6 +41,13 @@ void Progressbar::updateProgressState(int progress) {
     if (progress == this->lastProgress) {
         return;
     }
+    if (this->height <= 0) {
+        this->height = (CrossCraft::instance->height > 0) ? CrossCraft::instance->height : 480;
+    }
+    if (this->width <= 0) {
+        this->width = (CrossCraft::instance->width > 0) ? CrossCraft::instance->width : 640;
+    }
+
     if (std::abs(progress - this->lastProgress) < 2 && progress != 100 && progress != 0) {
         return;
     }
@@ -55,7 +68,7 @@ void Progressbar::updateProgressState(int progress) {
     t.vertexUV((float)screenWidth, 0.0f, 0.0f, (float)screenWidth / s, 0.0f);
     t.vertexUV(0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
     t.end();
-
+    
     if (progress >= 0) {
         glDisable(GL_TEXTURE_2D);
         int barX = screenWidth / 2 - 50;
@@ -63,21 +76,22 @@ void Progressbar::updateProgressState(int progress) {
         int barWidth = 100;
         int barHeight = 2;
 
-        glColor3f(128.0f / 255.0f, 128.0f / 255.0f, 128.0f / 255.0f);
-        glBegin(GL_QUADS);
-            glVertex2f(barX, barY);
-            glVertex2f(barX, barY + barHeight);
-            glVertex2f(barX + barWidth, barY + barHeight);
-            glVertex2f(barX + barWidth, barY);
-        glEnd();
+        t.begin();
+        t.color(128.0f / 255.0f, 128.0f / 255.0f, 128.0f / 255.0f);
+        t.vertex((float)barX, (float)barY, 0.0f);
+        t.vertex((float)barX, (float)(barY + barHeight), 0.0f);
+        t.vertex((float)(barX + barWidth), (float)(barY + barHeight), 0.0f);
+        t.vertex((float)(barX + barWidth), (float)barY, 0.0f);
+        t.end();
 
-        glColor3f(128.0f / 255.0f, 255.0f / 255.0f, 128.0f / 255.0f);
-        glBegin(GL_QUADS);
-            glVertex2f(barX, barY);
-            glVertex2f(barX, barY + barHeight);
-            glVertex2f(barX + progress, barY + barHeight);
-            glVertex2f(barX + progress, barY);
-        glEnd();
+        t.begin();
+        t.color(128.0f / 255.0f, 255.0f / 255.0f, 128.0f / 255.0f);
+        // glColor3f(128.0f / 255.0f, 255.0f / 255.0f, 128.0f / 255.0f);
+        t.vertex(barX, barY, 0.0f);
+        t.vertex(barX, barY + barHeight, 0.0f);
+        t.vertex(barX + progress, barY + barHeight, 0.0f);
+        t.vertex(barX + progress, barY, 0.0f);
+        t.end();
         
 
         glEnable(GL_TEXTURE_2D);

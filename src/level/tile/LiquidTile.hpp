@@ -8,7 +8,7 @@ protected:
     int tileId = 0;
     int tickRate = 0;
 
-    bool shouldRenderFace(Level* level, int x, int y, int z, int layer, int face) override;
+    bool shouldRenderFace(Level* level, int x, int y, int z, int face) override;
 private:
     bool tryFlow(Level* level, int x, int y, int z);
 public:
@@ -23,4 +23,5 @@ public:
     bool isSolid() override;
     LiquidType getLiquidType() override;
     float getBrightness(Level* level, int x, int y, int z) override;
+    short getRenderPass() override;
 };

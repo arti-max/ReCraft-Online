@@ -12,12 +12,11 @@ EntityMesh::EntityMesh(int w, int h, int d) {
     if (this->depth == 0) this->depth = 1;
 
     this->grid.clear();
+    this->grid.resize(this->width * this->height * this->depth);
+
     this->all.clear();
     this->tmp.clear();
-
-    this->grid.resize(this->width * this->height * this->depth);
-    this->all.resize(this->width * this->height * this->depth);
-    this->tmp.resize(this->width * this->height * this->depth);
+    this->entitiesToAdd.clear();
 }
 
 EntityMesh::~EntityMesh() {
@@ -33,29 +32,14 @@ EntityMesh::~EntityMesh() {
 
 void EntityMesh::clear() {
     this->grid.clear();
+    this->grid.resize(this->width * this->height * this->depth);
     this->all.clear();
     this->tmp.clear();
-
-    this->grid.resize(this->width * this->height * this->depth);
-    this->all.resize(this->width * this->height * this->depth);
-    this->tmp.resize(this->width * this->height * this->depth);
+    this->entitiesToAdd.clear();
 }
 
 void EntityMesh::addEntity(Entity* e) {
-    this->all.push_back(e);
-    EntityMeshSlot& slot = this->slotStart->init(e->x, e->y, e->z);
-    if (slot.xSlot >= 0 && slot.xSlot < this->width &&
-        slot.ySlot >= 0 && slot.ySlot < this->depth &&
-        slot.zSlot >= 0 && slot.zSlot < this->height) {
-        slot.add(e);
-        // Logger::logf(PREFIX_DEBUG, "New Entity spawned at %.1f,%.1f,%.1f!", e->x, e->y, e->z);
-    } else {
-        Logger::logf(PREFIX_WARNING, "Entity at %.1f,%.1f,%.1f outside mesh grid (%i, %i, %i)\n", e->x, e->y, e->z, this->width, this->depth, this->height);
-    }
-    e->xo = e->x;
-    e->yo = e->y;
-    e->zo = e->z;
-    e->emesh = this; 
+    this->entitiesToAdd.push_back(e);
 }
 
 void EntityMesh::removeEntity(Entity* e) {
@@ -130,6 +114,25 @@ void EntityMesh::render(Vec3D vec, Frustum& frustum, Textures* textures, float p
 }
 
 void EntityMesh::tickAll() {
+    if (!this->entitiesToAdd.empty()) {
+        for (Entity* e : this->entitiesToAdd) {
+            this->all.push_back(e);
+            EntityMeshSlot& slot = this->slotStart->init(e->x, e->y, e->z);
+            if (slot.xSlot >= 0 && slot.xSlot < this->width &&
+                slot.ySlot >= 0 && slot.ySlot < this->depth &&
+                slot.zSlot >= 0 && slot.zSlot < this->height) {
+                slot.add(e);
+                // Logger::logf(PREFIX_DEBUG, "New Entity spawned at %.1f,%.1f,%.1f!", e->x, e->y, e->z);
+            } else {
+                Logger::logf(PREFIX_WARNING, "Entity at %.1f,%.1f,%.1f outside mesh grid (%i, %i, %i)\n", e->x, e->y, e->z, this->width, this->depth, this->height);
+            }
+            e->xo = e->x;
+            e->yo = e->y;
+            e->zo = e->z;
+            e->emesh = this; 
+        }   
+        this->entitiesToAdd.clear();
+    }
     for (int i = 0; i < this->all.size(); ++i) {
         if (this->all[i]) {
             Entity* e = this->all[i]; 

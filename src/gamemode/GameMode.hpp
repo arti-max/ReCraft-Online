@@ -1,6 +1,9 @@
 #pragma once
 #include "sound/SoundType.hpp"
 
+#define GM_CREATIVE 1
+#define GM_SURVIVAL 0
+
 class Player;
 class Level;
 class CrossCraft;
@@ -27,5 +30,5 @@ public:
     virtual void spawnMob();
     virtual void prepareLevel(Level* level);
     virtual bool isSurvival();
-    virtual void apply();
+    virtual void apply(Player* player);
 };

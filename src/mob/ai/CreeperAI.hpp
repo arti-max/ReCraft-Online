@@ -8,6 +8,7 @@ public:
     Creeper* creeper;
 
     CreeperAI(Creeper* creep);
+    ~CreeperAI() override = default;
 
     bool attack(Entity* e) override;
     void beforeRemove() override;

@@ -107,6 +107,10 @@ void LevelRenderer::allChanged() {
     for (Chunk* chunk : chunks) {
         chunk->reset();
     }
+
+    for (Chunk* chunk : chunks) {
+        chunk->rebuild();
+    }
     
     std::cout << "LevelRenderer initialized: " << chunks.size() << " chunks" << std::endl;
 }
@@ -123,30 +127,41 @@ std::vector<Chunk*> LevelRenderer::getAllDirtyChunks() {
     return dirty;
 }
 
-void LevelRenderer::render(Player* player, int layer) {
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, textures->loadTexture("terrain", GL_NEAREST));
-    
+int LevelRenderer::render(Player* player, int layer) {
     float xd = player->x - lX;
     float yd = player->y - lY;
     float zd = player->z - lZ;
+    if (xd * xd + yd * yd + zd * zd > 64.0f) {
+        lX = player->x;
+        lY = player->y;
+        lZ = player->z;
+        std::sort(sortedChunks.begin(), sortedChunks.end(), DistanceSorter(player, layer));
+    }
+
+    displayListCache.clear();
+
+    float dd = (float)(256.0f / (1 << drawDistance));
+    float maxDistSqr = dd*dd;
     
-    // if (xd * xd + yd * yd + zd * zd > 64.0f) {
-    //     lX = player->x;
-    //     lY = player->y;
-    //     lZ = player->z;
-    //     std::sort(sortedChunks.begin(), sortedChunks.end(), DistanceSorter(player));
-    // }
-    
-    for (Chunk* chunk : chunks) {
+    for (Chunk* chunk : sortedChunks) {
         if (chunk->visible) {
-            float dd = static_cast<float>(256 / (1 << drawDistance));
-            if (drawDistance == 0 || chunk->distanceToSqr(player) < dd * dd) {
-                chunk->render(layer);
+            if (drawDistance == 0 || chunk->distanceToSqr(player) < maxDistSqr) {
+                chunk->appendLists(displayListCache, layer);
             }
         }
     }
+
+    this->renderCollectedChunks();
     
+    return (int)(displayListCache.size());
+}
+
+void LevelRenderer::renderCollectedChunks() {
+    if (!displayListCache.empty()) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textures->loadTexture("terrain", GL_NEAREST));
+        glCallLists((GLsizei)(displayListCache.size()), GL_INT, displayListCache.data());
+    }
     glDisable(GL_TEXTURE_2D);
 }
 
@@ -300,7 +315,7 @@ void LevelRenderer::setDirty(int x0, int y0, int z0, int x1, int y1, int z1) {
             for (int z = z0; z <= z1; ++z) {
                 int index = (x + y * xChunks) * zChunks + z;
                 if (index < chunks.size()) {
-                    chunks[index]->setDirty();
+                    chunks[index]->setAllDirty();
                 }
             }
         }
@@ -341,8 +356,7 @@ void LevelRenderer::renderHit(HitResult* h, Player* player, int mode, int tileTy
 
             t.begin();
             t._noColor();
-            Tile::tiles[tileType]->render(t, this->level, 0, x, y, z);
-            Tile::tiles[tileType]->render(t, this->level, 1, x, y, z);
+            Tile::tiles[tileType]->render(t, this->level, x, y, z);
             t.end();
             glDisable(GL_TEXTURE_2D);
         }
@@ -451,6 +465,7 @@ void LevelRenderer::renderClouds(float partialTicks) {
     float var1 = (static_cast<float>(cloudTicks) + partialTicks) * var4 * 0.03f;
     
     t.begin();
+    t.color(1.0f, 1.0f, 1.0f);
     
     for (int var8 = -2048; var8 < level->width + 2048; var8 += 512) {
         for (int var6 = -2048; var6 < level->height + 2048; var6 += 512) {
@@ -477,13 +492,13 @@ void LevelRenderer::renderSky() {
 
         Tessellator& t = Tessellator::getInstance();
 
-        t.color(0.5f, 0.8f, 1.0f);
         glColor3f(0.5f, 0.8f, 1.0f);
 
         float skyY = static_cast<float>(this->level->depth + 10);
         
         // glBegin(GL_QUADS);
         t.begin();
+        t.color(0.5f, 0.8f, 1.0f);
 
         for (int x = -2048; x < this->level->width + 2048; x += 512) {
             for (int z = -2048; z < this->level->height + 2048; z += 512) {

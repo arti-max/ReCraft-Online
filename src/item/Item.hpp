@@ -18,6 +18,7 @@ private:
 public:
     static std::vector<ItemModel*> models; 
     Item(Level* level, float x, float y, float z, int resourceId);
+    virtual ~Item() = default;
 
     void tick() override;
     void render(float partialTicks, Textures* textures) override;

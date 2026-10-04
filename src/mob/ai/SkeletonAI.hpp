@@ -10,6 +10,7 @@ public:
     Skeleton* parent = nullptr;
 
     SkeletonAI(Skeleton* skeleton);
+    ~SkeletonAI() override = default;
     void tick(Level* level, Mob* mob) override;
     void beforeRemove() override;
 };

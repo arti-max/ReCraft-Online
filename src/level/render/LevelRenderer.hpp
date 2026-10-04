@@ -36,6 +36,7 @@ private:
     float lZ = 0.0f;
     bool skyCompiled = false;
     std::vector<NameTagInfo> nameTagsToRender;
+    std::vector<GLint> displayListCache;
 
 public:
     static const int MAX_REBUILDS_PER_FRAME = 4;
@@ -50,7 +51,8 @@ public:
     
     void allChanged() override;
     std::vector<Chunk*> getAllDirtyChunks();
-    void render(Player* player, int layer);
+    int render(Player* player, int layer);
+    void renderCollectedChunks();
     void renderSurroundingGround();
     void compileSurroundingGround();
     void renderSurroundingWater();

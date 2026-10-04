@@ -72,6 +72,7 @@ static Tile bricksTile(46, 7);
 static BookshelfTile bookshelfTile(47); 
 static Tile mossStoneTile(48, 36); 
 static Bush cobwebTile(49, 11);
+static Tile obsidianTile(50, 37);
 
 
 const Tile* Tile::rock = (rockTile.setData(SoundType::stone, 1.0f, 1.0f)->setDrop(cobbleTile.id));
@@ -123,6 +124,7 @@ const Tile* Tile::bricks = bricksTile.setData(SoundType::stone, 1.0f, 1.0f);
 const Tile* Tile::mossStone = mossStoneTile.setData(SoundType::stone, 1.0f, 1.0f);
 const Tile* Tile::bookshelf = bookshelfTile.setData(SoundType::wood, 1.0f, 1.6f);
 const Tile* Tile::cobweb = cobwebTile.setData(SoundType::cloth, 0.4f, 0.5f);
+const Tile* Tile::obsidian = obsidianTile.setData(SoundType::stone, 1.2f, 20.0f);
 
 
 Tile::Tile(int id) {
@@ -152,12 +154,8 @@ Tile* Tile::setDrop(int drop) {
     return this;
 }
 
-bool Tile::shouldRenderFace(Level* level, int x, int y, int z, int layer, int face) {
-    if (layer == 1) {
-        return false;
-    } else {
-        return !level->isSolidTile(x, y, z);
-    }
+bool Tile::shouldRenderFace(Level* level, int x, int y, int z, int face) {
+    return !level->isSolidTile(x, y, z);
 }
 
 int Tile::getTexture(int face) {
@@ -173,43 +171,43 @@ void Tile::setShape(float x0, float y0, float z0, float x1, float y1, float z1) 
     this->maxZ = z1;
 }
 
-bool Tile::render(Tessellator& t, Level* level, int layer, int x, int y, int z) {
+bool Tile::render(Tessellator& t, Level* level, int x, int y, int z) {
     bool rendered = false;
     float c1 = 0.5f;
     float c2 = 0.8f;
     float c3 = 0.6f;
 
-    if (this->shouldRenderFace(level, x, y - 1, z, layer, 0)) {
+    if (this->shouldRenderFace(level, x, y - 1, z, 0)) {
         float brightness = this->getBrightness(level, x, y - 1, z);
         t.color(brightness * c1, brightness * c1, brightness * c1);
         this->renderFace(t, x, y, z, 0);
         rendered = true;
     }
-    if (this->shouldRenderFace(level, x, y + 1, z, layer, 1)) {
+    if (this->shouldRenderFace(level, x, y + 1, z, 1)) {
         float brightness = this->getBrightness(level, x, y + 1, z);
         t.color(brightness * 1.0f, brightness * 1.0f, brightness * 1.0f);
         this->renderFace(t, x, y, z, 1);
         rendered = true;
     }
-    if (this->shouldRenderFace(level, x, y, z - 1, layer, 2)) {
+    if (this->shouldRenderFace(level, x, y, z - 1, 2)) {
         float brightness = this->getBrightness(level, x, y, z - 1);
         t.color(brightness * c2, brightness * c2, brightness * c2);
         this->renderFace(t, x, y, z, 2);
         rendered = true;
     }
-    if (this->shouldRenderFace(level, x, y, z + 1, layer, 3)) {
+    if (this->shouldRenderFace(level, x, y, z + 1, 3)) {
         float brightness = this->getBrightness(level, x, y, z + 1);
         t.color(brightness * c2, brightness * c2, brightness * c2);
         this->renderFace(t, x, y, z, 3);
         rendered = true;
     }
-    if (this->shouldRenderFace(level, x - 1, y, z, layer, 4)) {
+    if (this->shouldRenderFace(level, x - 1, y, z, 4)) {
         float brightness = this->getBrightness(level, x - 1, y, z);
         t.color(brightness * c3, brightness * c3, brightness * c3);
         this->renderFace(t, x , y, z, 4);
         rendered = true;
     }
-    if (this->shouldRenderFace(level, x + 1, y, z, layer, 5)) {
+    if (this->shouldRenderFace(level, x + 1, y, z, 5)) {
         float brightness = this->getBrightness(level, x + 1, y, z);
         t.color(brightness * c3, brightness * c3, brightness * c3);
         this->renderFace(t, x, y, z, 5);
@@ -641,4 +639,8 @@ void Tile::renderPreview(Tessellator& t) {
     }
 
     t.end();
+}
+
+short Tile::getRenderPass() {
+    return 0;
 }

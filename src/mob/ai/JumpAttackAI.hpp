@@ -5,5 +5,6 @@
 class JumpAttackAI : public BasicAttackAI {
 public:
     JumpAttackAI();
+    ~JumpAttackAI() override = default;
     void jumpFromGround() override;
 };

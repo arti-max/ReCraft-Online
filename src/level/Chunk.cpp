@@ -26,6 +26,7 @@ Chunk::Chunk(Level* level, int x0, int y0, int z0, int x1, int y1, int z1) :
     this->boundingSphereRadius = std::sqrt(dx*dx + dy*dy + dz*dz);
 
     this->lists = glGenLists(2);
+    this->setAllDirty();
 }
 
 Chunk::~Chunk() {
@@ -34,50 +35,76 @@ Chunk::~Chunk() {
     }
 }
 
-void Chunk::rebuild(int layer) {
-    glNewList(this->lists + layer, GL_COMPILE);
+void Chunk::rebuild() {
+    this->updates++;
+    Chunk::rebuiltThisFrame++;
+
     glEnable(GL_TEXTURE_2D);
-    this->t.begin();
+    Tile* currentTile = nullptr;
 
-    for (int x = this->x0; x < this->x1; ++x) {
-        for (int y = this->y0; y < this->y1; ++y) {
-            for (int z = this->z0; z < this->z1; ++z) {
-                int id = this->level->getTile(x, y, z);
+    for (short layer = 0; layer < 2 ; layer++) {
+        this->dirty[layer] = true;
+    }
 
-                if (id > 0) {
-                    Tile::tiles[id]->render(this->t, this->level, layer, x, y, z);
+    for (short layer = 0; layer < 2; layer++) {
+        bool hasAnyGeometry = false;
+        bool hasNextRenderPass = false;
+
+        glNewList(this->lists + layer, GL_COMPILE);
+        this->t.begin();
+
+        for (int x = this->x0; x < this->x1; ++x) {
+            for (int y = this->y0; y < this->y1; ++y) {
+                for (int z = this->z0; z < this->z1; ++z) {
+                    int id = this->level->getTile(x, y, z);
+                    if (id > 0) {
+                        currentTile = Tile::tiles[id];
+                        if (currentTile != nullptr) {
+                            if (currentTile->getRenderPass() != layer) {
+                                hasNextRenderPass = true;
+                            } else {
+                                hasAnyGeometry |= currentTile->render(this->t, this->level, x, y, z);
+                            }
+                        }
+                    }
                 }
             }
         }
+
+        this->t.end();
+        glEndList();
+        this->dirty[layer] = false;
+        if (!hasNextRenderPass) {
+            for (short next = layer + 1; next < 2; next++) {
+                glNewList(this->lists + next, GL_COMPILE);
+                glEndList();
+                this->dirty[next] = false;
+            }
+            break;
+        }
+
     }
-
-    this->t.end();
-    glEndList();
-}
-
-void Chunk::rebuild() {
-    this->updates++;
-    this->rebuild(0);
-    this->rebuild(1);
-    this->dirty = false;
 }
 
 void Chunk::render(int layer) {
-    glCallList(this->lists + layer);
+    if (!this->dirty[layer]) {
+        glCallList(this->lists + layer);
+    }
 }
 
 bool Chunk::isDirty() {
-    return this->dirty;
+    return this->dirty[0] || this->dirty[1];
 }
 
-void Chunk::setDirty() {
-    this->dirty = true;
+void Chunk::setAllDirty() {
+    for (short layer = 0; layer < 2; layer++) {
+        this->dirty[layer] = true;
+    }
 }
 
 void Chunk::reset() {
-    this->dirty = true;
-
     for (int i = 0; i < 2; ++i) {
+        this->dirty[i] = true;
         glNewList(this->lists + i, GL_COMPILE);
         glEndList();
     }
@@ -88,4 +115,13 @@ float Chunk::distanceToSqr(Player* player) {
     float yd = player->y - this->y;
     float zd = player->z - this->z;
     return xd*xd + yd*yd + zd*zd;
+}
+
+void Chunk::appendLists(std::vector<GLint>& listsArr, int renderPass) {
+    if (!this->visible) {
+        return;
+    } 
+    if (!this->dirty[renderPass]) {
+        listsArr.push_back(this->lists + renderPass);
+    }
 }

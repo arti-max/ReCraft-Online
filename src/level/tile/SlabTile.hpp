@@ -5,7 +5,7 @@ class SlabTile : public Tile {
 private:
     bool doubleSlab = false;
 protected:
-    bool shouldRenderFace(Level* level, int x, int y, int z, int layer, int face) override;
+    bool shouldRenderFace(Level* level, int x, int y, int z, int face) override;
 public:
     SlabTile(int tileId, int textureId);
     SlabTile(int tileId, bool isDouble);

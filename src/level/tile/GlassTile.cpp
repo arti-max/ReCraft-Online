@@ -3,12 +3,12 @@
 GlassTile::GlassTile(int id) : TransparentTile(id, 49) {
 }
 
-bool GlassTile::shouldRenderFace(Level* level, int x, int y, int z, int layer, int face) {
+bool GlassTile::shouldRenderFace(Level* level, int x, int y, int z, int face) {
     int neighborId = level->getTile(x, y, z);
     
     if (neighborId == this->id) {
         return false;
     }
     
-    return TransparentTile::shouldRenderFace(level, x, y, z, layer, face);
+    return TransparentTile::shouldRenderFace(level, x, y, z, face);
 }

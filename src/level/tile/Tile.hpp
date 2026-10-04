@@ -15,7 +15,7 @@ class Tile {
 private:
 
 protected:
-    virtual bool shouldRenderFace(Level* level, int x, int y, int z, int layer, int face);
+    virtual bool shouldRenderFace(Level* level, int x, int y, int z, int face);
 public:
     Tile(int id);
     Tile (int id, int textureId);
@@ -71,6 +71,7 @@ public:
     static const Tile* mossStone;
     static const Tile* bookshelf;
     static const Tile* cobweb;
+    static const Tile* obsidian;
 
     int textureId = 0;
     int id = 0;
@@ -84,7 +85,7 @@ public:
     virtual Tile* setData(const SoundType& st, float particleGravity, float hardness);
     virtual Tile* setDrop(int id);
     virtual int getTexture(int face);
-    virtual bool render(Tessellator& t, Level* level, int layer, int x, int y, int z);
+    virtual bool render(Tessellator& t, Level* level, int x, int y, int z);
     virtual void renderFace(Tessellator& t, int x, int y, int z, int face);
     virtual void renderFace(Tessellator& t, int x, int y, int z, int face, int textureId);
     virtual void renderBackFace(Tessellator& t, int x, int y, int z, int face);
@@ -111,4 +112,5 @@ public:
     virtual HitResult* clip(int x, int y, int z, Vec3D& start, Vec3D& end);
     virtual void renderPreview(Tessellator& t);
     virtual void setShape(float x0, float y0, float z0, float x1, float y1, float z1);
+    virtual short getRenderPass();
 };

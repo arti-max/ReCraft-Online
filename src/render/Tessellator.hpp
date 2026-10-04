@@ -9,6 +9,8 @@ private:
     Tessellator(const Tessellator&) = delete;
     Tessellator& operator=(const Tessellator&) = delete;
 
+    static const int VERTEX_SIZE = 11;
+    std::vector<unsigned int> indexBuffer;
     std::vector<float> buffer;
     int vertices = 0;
     int p = 0;

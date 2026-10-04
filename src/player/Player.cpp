@@ -139,7 +139,9 @@ int Player::getScore() {
 }
 
 void Player::hurt(Entity* e, int dmg) {
-    Mob::hurt(e, dmg);
+    if (CrossCraft::instance->gamemode->isSurvival()) {
+        Mob::hurt(e, dmg);
+    }
 }
 
 bool Player::isPlayer() {

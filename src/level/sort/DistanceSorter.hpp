@@ -4,8 +4,15 @@
 
 struct DistanceSorter {
     Player* player;
-    DistanceSorter(Player* p) : player(p) {}
+    int layer; // Добавляем слой
+    
+    DistanceSorter(Player* p, int l) : player(p), layer(l) {}
+    
     bool operator()(Chunk* a, Chunk* b) const {
-        return a->distanceToSqr(player) < b->distanceToSqr(player);
+        if (layer == 1) {
+            return a->distanceToSqr(player) > b->distanceToSqr(player);
+        } else {
+            return a->distanceToSqr(player) < b->distanceToSqr(player);
+        }
     }
 };

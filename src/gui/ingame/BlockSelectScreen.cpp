@@ -65,7 +65,7 @@ void BlockSelectScreen::render(int xMouse, int yMouse) {
         glScalef(-1.0f, -1.0f, -1.0f);
         
         t.begin();
-        Tile::tiles[this->blocks[i]]->render(t, this->cc->level, 0, -2, 0, 0);
+        Tile::tiles[this->blocks[i]]->render(t, this->cc->level, -2, 0, 0);
         t.end();
         
         glPopMatrix();

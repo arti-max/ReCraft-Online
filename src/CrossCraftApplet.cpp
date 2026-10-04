@@ -1,6 +1,7 @@
 #include "CrossCraftApplet.hpp"
 #include <iostream>
 #include <emscripten.h>
+#include "gamemode/CreativeGameMode.hpp"
 #include "gamemode/GameMode.hpp"
 #include "gamemode/SurvivalGameMode.hpp"
 
@@ -69,7 +70,7 @@ void CrossCraftApplet::start() {
         std::cout << "Creating CrossCraft instance..." << std::endl;
         game = new CrossCraft("#canvas", width, height, false);
         game->appletMode = true;
-        if (gamemode == 1) game->gamemode = new GameMode(game);
+        if (gamemode == 1) game->gamemode = new CreativeGameMode(game);
         else game->gamemode = new SurvivalGameMode(game);
         
         if (!username.empty() && !sessionid.empty()) {
